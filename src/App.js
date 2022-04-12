@@ -1,11 +1,69 @@
 import { useState } from "react";
 
+const Filter = ({ handleChange, value }) => {
+  return (
+    <div>
+      filter the names : <input onChange={handleChange} value={value} />
+    </div>
+  );
+};
+
+const PersonForm = ({
+  onSubmit,
+  handleNameChange,
+  handleNumberChange,
+  newName,
+  newNumber,
+}) => {
+  return (
+    <form onSubmit={onSubmit}>
+      <div>
+        name: <input onChange={handleNameChange} value={newName} />
+      </div>
+      <div>
+        number: <input onChange={handleNumberChange} value={newNumber} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
+const Person = ({ person }) => {
+  return (
+    <p>
+      {person.name} {person.number}
+    </p>
+  );
+};
+
+const Persons = ({ persons }) => {
+  return persons.map((person) => <Person key={person.name} person={person} />);
+};
+
 const App = () => {
-  const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", number: "040-123456", id: 1 },
+    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
+    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
+    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
+  ]);
   const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+
+  const handleNameFilterChange = (event) => {
+    const filter = event.target.value.toLowerCase();
+    setNameFilter(filter);
+  };
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
+  };
+
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value);
   };
 
   const handleAddName = (event) => {
@@ -14,30 +72,36 @@ const App = () => {
     if (found) {
       alert(` ${newName} is already present`);
       setNewName("");
+      setNewNumber("");
       return;
     }
     const nameObject = {
       name: newName,
+      number: newNumber,
     };
     setPersons(persons.concat(nameObject));
     setNewName("");
+    setNewNumber("");
   };
+
+  const personsToDisplay = persons.filter((person) =>
+    person.name.toLowerCase().includes(nameFilter)
+  );
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={handleAddName}>
-        <div>
-          name: <input onChange={handleNameChange} value={newName} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter handleChange={handleNameFilterChange} value={nameFilter} />
+      <h2>Add a new</h2>
+      <PersonForm
+        onSubmit={handleAddName}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        newName={newName}
+        newNumber={newNumber}
+      />
       <h2>Numbers</h2>
-      {persons.map((person) => (
-        <p key={person.name}>{person.name}</p>
-      ))}
+      <Persons persons={personsToDisplay} />
     </div>
   );
 };
