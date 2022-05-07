@@ -53,7 +53,6 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState("");
 
   useEffect(() => {
-    console.log("effect");
     personService.getAll().then((initialPersons) => {
       setPersons(initialPersons);
     });
